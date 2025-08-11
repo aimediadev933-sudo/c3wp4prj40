@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEA-HAZEMON@TEIN - Real-Time Haze Monitoring and Forest Fire Detection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #9A2AA0;
+            --secondary: #DA3FA3;
+            --body: #FCF5EC;
+            --text: #1D1D1B;
+            --secondary-dark: #4E245C;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--body);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .logos {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            height: 60px;
+            width: auto;
+            transition: transform 0.3s ease;
+            background: white;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .logo:hover {
+            transform: scale(1.1);
+        }
+
+        .hero-text h1 {
+            font-size: 2.0rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero-text p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .hero-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: inline-block;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--secondary-dark);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: background-color 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-menu a:hover {
+            background-color: var(--primary);
+        }
+
+        /* Main Content */
+        main {
+            padding: 3rem 0;
+        }
+
+        .section {
+            margin-bottom: 4rem;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--primary);
+        }
+
+        .section h2 {
+            color: var(--secondary-dark);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        .environmental-alert {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border-left-color: #fd79a8;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .environmental-alert h4 {
+            color: #d63031;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transform: translateY(0);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(154, 42, 160, 0.3);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .countries-map {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .country-card {
+            background: var(--body);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .country-card:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .country-card.lead {
+            background: var(--primary);
+            color: white;
+        }
+
+        .technology-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .tech-card {
+            background: linear-gradient(135deg, var(--secondary-dark), #6a3775);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(78, 36, 92, 0.3);
+        }
+
+        .tech-card h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .tech-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .iot-sensors {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .sensor-item {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .sensor-item:hover {
+            background: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        .deployment-timeline {
+            background: var(--body);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .timeline-icon {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            margin-right: 1.5rem;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .timeline-content h4 {
+            color: var(--secondary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .covid-impact {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border-left-color: #fd79a8;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .covid-impact h4 {
+            color: #d63031;
+            margin-bottom: 0.5rem;
+        }
+
+        .partners-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .partner-card {
+            background: var(--body);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .partner-card:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .partner-card.lead {
+            background: var(--primary);
+            color: white;
+        }
+
+        .outcomes {
+            background: linear-gradient(135deg, #fff, #e8f5e8);
+            border-left-color: #27ae60;
+        }
+
+        .challenges {
+            background: linear-gradient(135deg, #fff, var(--body));
+            border-left-color: #e74c3c;
+        }
+
+        .thailand-flag {
+            display: inline-block;
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary-dark);
+            color: white;
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        .sdg-badges {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .sdg-badge {
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            opacity: 0.8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-text h1 {
+                font-size: 1.6rem;
+            }
+
+            .hero-text p {
+                font-size: 1rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .logos {
+                justify-content: center;
+            }
+
+            .logo {
+                height: 50px;
+            }
+
+            .nav-menu {
+                gap: 1rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .timeline-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .timeline-icon {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .hero-text h1 {
+                font-size: 1.4rem;
+            }
+
+            .section h2 {
+                font-size: 1.5rem;
+            }
+
+            .logo {
+                height: 40px;
+            }
+
+            .logos {
+                gap: 1rem;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logos">
+                    <img src="images/logos/eu-logo.png" alt="European Union" class="logo">
+                    <img src="images/logos/tein-logo.png" alt="TEIN CC" class="logo">
+                    <img src="images/logos/asia-connect-logo.png" alt="Asia Connect" class="logo">
+                </div>
+                <div class="hero-text">
+                    <h1>SEA-HAZEMON@TEIN</h1>
+                    <p>Real-Time Haze Monitoring & Forest Fire Detection</p>
+                    <div class="hero-badge"><span class="thailand-flag">🇹🇭</span>Led by Thailand • 3rd Call • ICN & IoT</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <ul class="nav-menu">
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#technology">Technology</a></li>
+                <li><a href="#deployment">Deployment</a></li>
+                <li><a href="#outcomes">Outcomes</a></li>
+                <li><a href="#partners">Partners</a></li>
+                <li><a href="#future">Future</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="overview" class="section">
+            <h2>Project Overview</h2>
+            <p>The SEA-HAZEMON@TEIN project addressed the growing issue of transboundary haze and air pollution in Southeast Asia, particularly from forest fires and agricultural crop burning. By deploying <span class="highlight">low-cost IoT-based Canarin air quality sensors integrated with Information-Centric Networking (ICN) and fog computing</span>, the project created an innovative environmental monitoring system across multiple ASEAN countries.</p>
+            
+            <div class="environmental-alert">
+                <h4>🌫️ Critical Environmental Challenge</h4>
+                <p>Transboundary haze pollution from forest fires and crop burning poses serious health risks across Southeast Asia, requiring real-time monitoring and early warning systems for community protection.</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">200+</div>
+                    <div>Sensor Kits Planned</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">180</div>
+                    <div>Sensors Delivered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4</div>
+                    <div>ASEAN Countries</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">21</div>
+                    <div>Nodes in Thailand</div>
+                </div>
+            </div>
+
+            <h3>🗺️ Multi-Country Deployment</h3>
+            <div class="countries-map">
+                <div class="country-card lead">🇹🇭 Thailand (Lead)</div>
+                <div class="country-card">🇱🇦 Laos</div>
+                <div class="country-card">🇵🇭 Philippines</div>
+                <div class="country-card">🇮🇩 Indonesia</div>
+            </div>
+        </section>
+
+        <section id="technology" class="section">
+            <h2>Advanced Technology Stack</h2>
+            <div class="technology-grid">
+                <div class="tech-card">
+                    <div class="tech-icon">📡</div>
+                    <h3>Information-Centric Networking</h3>
+                    <p>ActiveNDN platform enabling real-time, recursive in-network data processing on low-power devices</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">☁️</div>
+                    <h3>Fog Computing Architecture</h3>
+                    <p>Hybrid cloud-fog platform integrating LoRaWAN, WiFi, and edge data processing for remote areas</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🌐</div>
+                    <h3>IoT Sensor Networks</h3>
+                    <p>Canarin air quality sensors for PM2.5 and CO monitoring with field validation and calibration</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">📊</div>
+                    <h3>Real-Time Analytics</h3>
+                    <p>Grafana-based visualization with offline dashboards and local storage capabilities</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🔔</div>
+                    <h3>Community Alerts</h3>
+                    <p>Localized warning systems distinguishing crop burning from forest fire sources</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🔬</div>
+                    <h3>Data Validation</h3>
+                    <p>ANOVA and Z-score testing for sensor reliability and batch quality grading</p>
+                </div>
+            </div>
+
+            <div class="iot-sensors">
+                <h3>🔬 Canarin Sensor Specifications</h3>
+                <p>Validated sensor performance with rigorous testing protocols:</p>
+                <div class="sensor-grid">
+                    <div class="sensor-item">83 PM2.5 Sensors</div>
+                    <div class="sensor-item">109 CO Sensors</div>
+                    <div class="sensor-item">LoRaWAN Connectivity</div>
+                    <div class="sensor-item">WiFi Backup</div>
+                    <div class="sensor-item">3G Adaptations</div>
+                    <div class="sensor-item">Offline Storage</div>
+                    <div class="sensor-item">Real-time Processing</div>
+                    <div class="sensor-item">Community Training</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="deployment" class="section">
+            <h2>Deployment Timeline & Activities</h2>
+            <div class="deployment-timeline">
+                <div class="timeline-item">
+                    <div class="timeline-icon">🎓</div>
+                    <div class="timeline-content">
+                        <h4>Air Quality IoT Workshops (I & II)</h4>
+                        <p>Hands-on training on IoT and ICN technologies, platform setup, and Canarin device management for partner institutions.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">🗺️</div>
+                    <div class="timeline-content">
+                        <h4>Site Selection & Network Design</h4>
+                        <p>Deployment planning across 4 countries with Thailand leading 21 sensor nodes in Chiang Rai province.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">💻</div>
+                    <div class="timeline-content">
+                        <h4>ActiveNDN Platform Development</h4>
+                        <p>Created Information-Centric Networking platform for in-network processing and real-time analytics capabilities.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">📡</div>
+                    <div class="timeline-content">
+                        <h4>Sensor Deployment & Testing</h4>
+                        <p>Over 180 Canarin sensors tested and deployed in Thailand, Philippines, and Bangkok with community training.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">📊</div>
+                    <div class="timeline-content">
+                        <h4>Data Analytics & Calibration</h4>
+                        <p>Reliability and validity testing using ANOVA and Z-scores to grade sensor batches for deployment standards.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">🖥️</div>
+                    <div class="timeline-content">
+                        <h4>Dashboard Development</h4>
+                        <p>Offline dashboard implementation with local storage and Grafana-based visualization for remote access.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="covid-impact">
+                <h4>🦠 COVID-19 Adaptation</h4>
+                <p>Despite pandemic delays affecting hardware shipment and cross-border deployment, the team successfully achieved key milestones in platform development and partial site deployment through innovative remote collaboration.</p>
+            </div>
+        </section>
+
+        <section id="outcomes" class="section outcomes">
+            <h2>Key Achievements & Innovation</h2>
+            
+            <h3>🚀 Technical Breakthroughs</h3>
+            <ul style="margin: 1rem 0; padding-left: 2rem;">
+                <li><strong>ActiveNDN Platform:</strong> Revolutionary ICN system enabling real-time, recursive in-network data processing</li>
+                <li><strong>Hybrid Cloud-Fog Model:</strong> Addressed connectivity gaps in remote areas with localized dashboards</li>
+                <li><strong>Sensor Validation:</strong> 83 PM2.5 and 109 CO sensors met strict deployment standards</li>
+                <li><strong>Offline Capabilities:</strong> Grafana + InfluxDB dashboards function during internet outages</li>
+            </ul>
+
+            <h3>🌍 Community Impact</h3>
+            <p><strong>Local Empowerment:</strong> Community groups in Chiang Rai trained to maintain sensor nodes independently, ensuring sustainable local management.</p>
+            <p><strong>Real-time Monitoring:</strong> System delivers immediate air quality data, localized alerts, and distinguishes between crop burning and forest fire sources.</p>
+            
+            <h3>🔬 Research Innovation</h3>
+            <p>The project exemplifies how future internet technologies (ICN, fog computing, IoT) can serve public health and disaster mitigation across transboundary environmental challenges.</p>
+        </section>
+
+        <section id="partners" class="section">
+            <h2>International Partnership Network</h2>
+            <p>Led by Thailand Research and Education Network (ThaiREN) with extensive academic and research collaboration:</p>
+            
+            <div class="partners-grid">
+                <div class="partner-card lead">
+                    <h3>ThaiREN</h3>
+                    <p>Thailand Research and Education Network<br><strong>Lead Organization</strong></p>
+                </div>
+                <div class="partner-card lead">
+                    <h3>AIT</h3>
+                    <p>Asian Institute of Technology<br><strong>Technical Lead</strong></p>
+                </div>
+                <div class="partner-card">
+                    <h3>Mahidol University</h3>
+                    <p>Thailand</p>
+                </div>
+                <div class="partner-card">
+                    <h3>Silpakorn University</h3>
+                    <p>Thailand</p>
+                </div>
+                <div class="partner-card">
+                    <h3>Kasetsart University</h3>
+                    <p>Thailand</p>
+                </div>
+                <div class="partner-card">
+                    <h3>ITB</h3>
+                    <p>Institute of Technology<br>Bandung, Indonesia</p>
+                </div>
+                <div class="partner-card">
+                    <h3>NUOL</h3>
+                    <p>National University<br>of Laos</p>
+                </div>
+                <div class="partner-card">
+                    <h3>UPLB</h3>
+                    <p>University of the Philippines<br>Los Baños</p>
+                </div>
+                <div class="partner-card">
+                    <h3>Sorbonne University</h3>
+                    <p>France</p>
+                </div>
+                <div class="partner-card">
+                    <h3>IT University</h3>
+                    <p>Copenhagen, Denmark</p>
+                </div>
+                <div class="partner-card">
+                    <h3>ICTP</h3>
+                    <p>Italy</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section challenges">
+            <h2>Challenges & Future Directions</h2>
+            
+            <h3>⚠️ Implementation Challenges</h3>
+            <ul style="margin: 1rem 0; padding-left: 2rem;">
+                <li><strong>COVID-19 Disruptions:</strong> Pandemic lockdowns delayed hardware shipment and prevented cross-border deployment</li>
+                <li><strong>Frequency Limitations:</strong> Philippines faced LoRa restrictions requiring WiFi and 3G adaptations</li>
+                <li><strong>Deployment Delays:</strong> Travel and procurement constraints slowed progress in Laos and Indonesia</li>
+                <li><strong>Connectivity Issues:</strong> Remote area deployments required innovative offline solutions</li>
+            </ul>
+
+            <h3>🚀 Future Development Plans</h3>
+            <p><strong>Complete Regional Deployment:</strong> Scale deployments to all 4 countries with remaining Canarin sensors.</p>
+            <p><strong>Predictive Analytics:</strong> Integrate machine learning models using ICN data streams to forecast haze events.</p>
+            <p><strong>Multilingual Interface:</strong> Expand user interface localization with SMS alerts and local language support.</p>
+            <p><strong>ASEAN Integration:</strong> Collaborate with ASEAN Haze Monitoring System for regional data sharing.</p>
+            <p><strong>Research Expansion:</strong> Strengthen TEIN-wide ICN expertise through AIT-led internship programs.</p>
+        </section>
+
+        <section id="future" class="section">
+            <h2>Sustainable Development Goals</h2>
+            <p>This environmental monitoring project addresses critical health and climate challenges across Southeast Asia:</p>
+            <div class="sdg-badges">
+                <div class="sdg-badge">SDG 3: Good Health & Well-being</div>
+                <div class="sdg-badge">SDG 11: Sustainable Cities</div>
+                <div class="sdg-badge">SDG 13: Climate Action</div>
+                <div class="sdg-badge">SDG 17: Partnerships for Goals</div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Project Details</h3>
+                    <p>Category: WP4 (Work Package 4)</p>
+                    <p>Call: 3rd Call</p>
+                    <p>Focus: Environmental Monitoring</p>
+                    <p>Lead: Thailand 🇹🇭 (ThaiREN & AIT)</p>
+                    <p>Technology: ICN, IoT, Fog Computing</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Technology Innovation</h3>
+                    <p>• ActiveNDN ICN Platform</p>
+                    <p>• Canarin IoT Sensors</p>
+                    <p>• Cloud-Fog Hybrid Architecture</p>
+                    <p>• Real-time Analytics</p>
+                    <p>• Offline Dashboard Capabilities</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Environmental Impact</h3>
+                    <p>Pioneering real-time haze monitoring across Southeast Asia using advanced networking technologies to protect public health and enable rapid response to transboundary air pollution events.</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 SEA-HAZEMON@TEIN Project. Led by ThaiREN & AIT with international partners. Supported by European Union, TEIN CC, and Asia Connect.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (
